@@ -17,8 +17,8 @@ public:
 	unsigned int m_size() const noexcept { return this->m_number_items; }
 
 protected:
-	unsigned int m_increment_size() const noexcept { return (++this->m_number_items); };
-	unsigned int m_decrement_size() const noexcept { return (--this->m_number_items); };
+	unsigned int m_increment_size() noexcept { return (++this->m_number_items); };
+	unsigned int m_decrement_size() noexcept { return (--this->m_number_items); };
 
 private:
 	unsigned int m_number_items;			//Number of items in structure
