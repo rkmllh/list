@@ -12,8 +12,18 @@ class position
 {
 public:
 	position(T val) : m_position_obj{ val } {};
-private:
+	position() : m_position_obj{} {};
 	T m_position_obj;
+};
+
+struct list_under_range : public std::exception
+{
+	const char* what() const noexcept { return "list_under_range!"; }
+};
+
+struct list_over_range : public std::exception
+{
+	const char* what() const noexcept { return "list_over_range!"; }
 };
 
 template <typename Type, class Pos>
@@ -75,7 +85,7 @@ template <typename Type, class Pos>
 Pos double_linked_list<Type, Pos>::m_push(Type x)
 {
 	items_s* item = (items_s*)smart_new(sizeof(items_s));
-	Pos p (&item->m_s_data);
+	Pos pos (&item->m_s_data);
 
 	item->m_s_data = x;
 
@@ -92,18 +102,45 @@ Pos double_linked_list<Type, Pos>::m_push(Type x)
 		this->m_tail = item;
 	}
 
-	return p;
+	this->m_increment_size();
+
+	return pos;
 }
 
 template <typename Type, class Pos>
 Pos double_linked_list<Type, Pos>::m_pop()
 {
-	Pos pos{0};
-	return pos;
+	bool b_ref = 0;
+
+	if (this->m_tail == nullptr)
+	{
+		throw list_under_range{};
+	}
+	else if (this->m_tail == this->m_head)	//We have just an item
+	{
+		delete this->m_tail;
+		this->m_tail = this->m_head = nullptr;
+	}
+	else
+	{
+		this->m_tail = this->m_tail->m_s_prev;
+		delete this->m_tail->m_s_next;
+		this->m_tail->m_s_next = nullptr;
+		b_ref = true;
+	}
+
+	this->m_decrement_size();
+
+	return b_ref ? Pos(&this->m_tail->m_s_data) : nullptr;
 }
 
 template <typename Type, class Pos>
 void double_linked_list<Type, Pos>::m_destroy()
+{
+}
+
+template <typename Type, class Pos>
+Type* double_linked_list<Type, Pos>::get_next()
 {
 }
 
@@ -113,7 +150,7 @@ ostream& double_linked_list<Type, Pos>::operator<<(ostream& os)
 	items_s* p = this->m_head;
 	while (p)
 	{
-		os<< p->m_s_data << std::endl;
+		os << p->m_s_data << std::endl;
 		p = p->m_s_next;
 	}
 
