@@ -9,7 +9,7 @@ public:
 	one_side_list() : m_number_items{ 0 } {};
 
 	virtual bool m_is_empty() const                    = 0;
-	virtual Pos m_push(Type x)                         = 0;
+	virtual Pos m_push(const Type& x)                  = 0;
 	virtual Pos m_pop()                                = 0;
 	virtual void m_destroy()                           = 0;
 	

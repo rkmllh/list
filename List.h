@@ -8,6 +8,8 @@ class list : public one_side_list <Type, Pos>
 public:
 
 	//Setters
-	virtual Pos m_insert(Pos pos) = 0;
-	virtual Pos m_remove(Pos pos) = 0;
+	virtual Pos m_insert(Pos pos)      = 0;
+	virtual Pos m_remove(Pos pos)      = 0;
+	virtual Pos m_begin() const        = 0;
+	virtual Pos m_end()   const        = 0;
 };

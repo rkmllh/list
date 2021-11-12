@@ -1,6 +1,5 @@
 #pragma once
 #include "list.h"
-#include "memory.h"
 #include <iostream>
 using namespace std;
 
@@ -38,13 +37,16 @@ public:
 	virtual Pos m_insert(Pos pos)   override;
 	virtual Pos m_remove(Pos pos)   override;
 
-	virtual bool m_is_empty() const override;
-	virtual Pos m_push(Type x)      override;
-	virtual Pos m_pop()             override;
-	virtual void m_destroy()        override;
+	virtual bool m_is_empty()              const override;
+	virtual Pos m_push(const Type& x)      override;
+	virtual Pos m_pop()                    override;
+	virtual void m_destroy()               override;
 
-	Type* get_next();
-	Type* get_prev();
+	virtual Pos get_next();
+	virtual Pos get_prev();
+
+	virtual Pos m_begin() const override;
+	virtual Pos m_end()   const override;
 
 	//Overloading operators
 	ostream& operator<<(ostream& os);
@@ -53,14 +55,14 @@ private:
 
 	struct items_s
 	{
-		Type m_s_data;				//Effective value
 		items_s* m_s_prev;			//Previous value
 		items_s* m_s_next;			//Next value
+		Type m_s_data;				//Effective value
 	};
 
-	items_s* m_head;					//First value
-	items_s* m_tail;					//Last value
-	items_s* m_current_item;			//Keep trace of current item referenced by a user
+	items_s* m_head;                            //First value
+	items_s* m_tail;                            //Last value
+	mutable items_s* m_current_item;            //Keep trace of current item referenced by a user
 };
 
 template <typename Type, class Pos>
@@ -82,12 +84,13 @@ Pos double_linked_list<Type, Pos>::m_remove(Pos pos)
 }
 
 template <typename Type, class Pos>
-Pos double_linked_list<Type, Pos>::m_push(Type x)
+Pos double_linked_list<Type, Pos>::m_push(const Type& x)
 {
-	items_s* item = (items_s*)smart_new(sizeof(items_s));
+	items_s* item = new items_s;
 	Pos pos (&item->m_s_data);
-
+	
 	item->m_s_data = x;
+	item->m_s_next = item->m_s_prev = nullptr;
 
 	if (this->m_tail != nullptr)
 	{
@@ -140,8 +143,32 @@ void double_linked_list<Type, Pos>::m_destroy()
 }
 
 template <typename Type, class Pos>
-Type* double_linked_list<Type, Pos>::get_next()
+Pos double_linked_list<Type, Pos>::get_next()
 {
+	this->m_current_item = this->m_current_item->m_s_next;
+	return Pos{this->m_current_item ? &this->m_current_item->m_s_data : nullptr};
+}
+
+template <typename Type, class Pos>
+Pos double_linked_list<Type, Pos>::get_prev()
+{
+	this->m_current_item = this->m_current_item->m_s_prev;
+	return Pos{ this->m_current_item ? &this->m_current_item->m_s_data : nullptr };
+	return 0;
+}
+
+template <typename Type, class Pos>
+Pos double_linked_list<Type, Pos>::m_begin() const
+{
+	this->m_current_item = this->m_head;
+	return Pos(this->m_head ? &this->m_head->m_s_data : nullptr);
+}
+
+template <typename Type, class Pos>
+Pos double_linked_list<Type, Pos>::m_end() const
+{
+	this->m_current_item = this->m_tail;
+	return Pos(this->m_tail ? &this->m_tail->m_s_data : nullptr);
 }
 
 template <typename Type, class Pos>

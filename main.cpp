@@ -4,7 +4,7 @@ int main(void)
 {
 	try
 	{
-		dll<const char*>d;
+		dll<std::string>d;
 
 		d.m_push("Art");
 		d.m_push("of");
@@ -12,11 +12,21 @@ int main(void)
 		d.m_push("in");
 		d.m_push("C++");
 
+		for(auto s = d.m_end(); s.m_position_obj; s = d.get_prev())
+			std::cout << *s.m_position_obj << std::endl;
+
+		cout << endl;
+
 		d.operator<<(std::cout);
 	}
-	catch (...)
+	catch (bad_alloc)
 	{
-		std::cout << "In catch block!" << std::endl;
+		std::cerr << "exception:bad_alloc" << std::endl;
 	}
-	
+	catch (list_under_range)
+	{
+		std::cerr << "exception:list_under_range" << std::endl;
+	}
+
+	//catch(...)
 }
